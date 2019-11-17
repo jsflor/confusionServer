@@ -3,15 +3,18 @@ const Schema = mongoose.Schema;
 
 const dishSchema = new Schema({
     dish: {
-        type: mongoose.Schema.Type.ObjectId,
-        ref:'Dish'
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'Dish',
+        required: true
     }
 });
 
 const favoriteSchema = new Schema({
     user: {
-        type: mongoose.Schema.Type.ObjectId,
-        ref: 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        unique: true,
+        required: true
     },
     dishes: [ dishSchema ]
 },{
