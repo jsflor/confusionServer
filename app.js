@@ -25,7 +25,8 @@ const Dishes = require('./models/dishes');
 const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false
 });
 
 

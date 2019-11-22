@@ -33,7 +33,7 @@ favoriteRouter.route('/')
             var newDishes = [];
             reqDishes.map((reqdish) => {
                 favDishes.map((favdish) => {
-                    if(!(reqdish._id.equals(favdish))){
+                    if(!(favdish.equals(reqdish._id))){
                         newDishes.push(reqdish._id);
                     }
                 });
@@ -41,15 +41,9 @@ favoriteRouter.route('/')
             favDishes.push(newDishes);
             favorites.save()
             .then((favorites) => {
-                Favorites.findById(favorites._id)
-                    .populate('user')
-                    .populate('dishes')
-                    .then((favorites) => {
-                        res.statusCode = 200;
-                        res.setHeader('Content-Type', 'application/json');
-                        res.json(favorites);
-                    }, (err) => next(err))
-                    .catch((err) => next(err));
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(favorites);
             }, (err) => next(err))
             .catch((err) => next(err));
         } else {
@@ -66,7 +60,7 @@ favoriteRouter.route('/')
             }, (err) => next(err))
             .catch((err) => next(err));
         }
-    })
+    }, (err) => next(err))
     .catch((err) => next(err));
 })
 .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
@@ -141,9 +135,19 @@ favoriteRouter.route('/:dishId')
             }
         }, { new: true })
         .then((resp) => {
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.json(resp);
+            if(resp.dishes.length !== 0){
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(resp);
+            } else {
+                Favorites.findByIdAndDelete(resp._id)
+                .then((resp) => {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(resp);
+                }, (err) => next(err))
+                .catch((err) => next(err));
+            }
         }, (err) => next(err))
         .catch((err) => next(err));
     }, (err) => next(err))
