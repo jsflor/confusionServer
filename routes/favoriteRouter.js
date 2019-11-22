@@ -24,11 +24,11 @@ favoriteRouter.route('/')
     .catch((err) => next(err));
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    //req.body.dishes = [{"_id": "3534534"}, {"_id": "353345344"}]
+    //req.body = [{"_id": "3534534"}, {"_id": "353345344"}]
     Favorites.findOne({ "user": req.user._id })
     .then((favorites) => {
         if(favorites !== null){
-            var reqDishes = req.body.dishes;
+            var reqDishes = req.body;
             var favDishes = favorites.dishes;
             var newDishes = [];
             reqDishes.map((reqdish) => {
@@ -54,7 +54,7 @@ favoriteRouter.route('/')
             .catch((err) => next(err));
         } else {
             var dishes = [];
-            req.body.dishes.map((dish) => {
+            req.body.map((dish) => {
                 dishes.push(dish._id);
             });
             Favorites.create({ user: req.user._id, dishes: dishes })
@@ -99,8 +99,8 @@ favoriteRouter.route('/:dishId')
                 err.status = 400;
                 return next(err);
            } else {
-            favorites[0].dishes.push(req.params.dishId);
-            favorites[0].save()
+            favorites.dishes.push(req.params.dishId);
+            favorites.save()
             .then((favorites) => {
                 Favorites.findById(favorites._id)
                     .populate('user')
