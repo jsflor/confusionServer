@@ -30,16 +30,18 @@ favoriteRouter.route('/')
         if(favorites !== null){
             var reqDishes = req.body;
             var favDishes = favorites.dishes;
-            var newDishes = [];
             reqDishes.map((reqdish) => {
-                favDishes.map((favdish) => {
-                    if(!(favdish.equals(reqdish._id))){
-                        newDishes.push(reqdish._id);
-                    }
-                });
+                var alreadyFavorite = favDishes.filter((dish) => dish.equals(reqdish._id));
+                if(alreadyFavorite.length === 0){
+                    favDishes.push(reqdish._id);
+                }
             });
-            favDishes.push(newDishes);
-            favorites.save()
+            Favorites.findByIdAndUpdate(favorites._id, {
+                $set: {
+                    user: req.user._id,
+                    dishes: favDishes
+                }
+            }, { new: true })
             .then((favorites) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
